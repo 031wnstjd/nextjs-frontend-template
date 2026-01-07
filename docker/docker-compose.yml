@@ -1,0 +1,14 @@
+# ===========================================
+# Docker Compose - 기본 설정
+# ===========================================
+# 이 파일은 환경별 compose 파일과 함께 사용됩니다.
+#
+# 개발 환경:
+#   docker-compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml up
+#
+# 프로덕션 환경:
+#   docker-compose -f docker/docker-compose.yml -f docker/docker-compose.prod.yml up -d
+
+services:
+  app:
+    image: nextjs-template:latest

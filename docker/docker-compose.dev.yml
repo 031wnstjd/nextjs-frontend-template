@@ -1,0 +1,32 @@
+# ===========================================
+# Docker Compose - 개발 환경
+# ===========================================
+# 사용법:
+#   docker-compose -f docker/docker-compose.yml -f docker/docker-compose.dev.yml up
+
+services:
+  # Next.js 애플리케이션
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: deps  # 개발 모드에서는 deps 단계까지만 빌드
+    container_name: nextjs-app-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      # 소스 코드 마운트 (핫 리로드 지원)
+      - ../src:/app/src
+      - ../public:/app/public
+      # node_modules는 컨테이너 내부 것 사용
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8080/api
+    command: pnpm dev
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
