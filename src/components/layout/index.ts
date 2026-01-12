@@ -6,3 +6,4 @@
 export { Header, default as HeaderDefault } from './header';
 export { Footer, default as FooterDefault } from './footer';
 export { Sidebar, default as SidebarDefault } from './sidebar';
+export { DashboardLayout, default as DashboardLayoutDefault } from './dashboard-layout';
