@@ -1,6 +1,6 @@
 /**
  * @file 홈 페이지
- * @description 템플릿에 포함된 컴포넌트 데모 페이지
+ * @description Next.js 15 템플릿 메인 페이지
  */
 
 'use client';
@@ -19,11 +19,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { ExampleCard } from '@/features/example';
 import { useLocalStorage, useBreakpoints, useIndexedDB } from '@/hooks';
 import { useUIStore } from '@/lib/store';
 import { toast } from 'sonner';
-import type { Example } from '@/features/example';
 
 /**
  * IndexedDB에 저장할 메모 타입
@@ -33,42 +31,6 @@ interface Memo {
   content: string;
   createdAt: string;
 }
-
-/**
- * 목업 예시 데이터
- */
-const mockExamples: Example[] = [
-  {
-    id: '1',
-    title: '프로젝트 설정 완료',
-    description: 'Next.js 15.5.6 템플릿 프로젝트 초기 설정이 완료되었습니다.',
-    status: 'completed',
-    priority: 1,
-    tags: ['setup', 'template'],
-    createdAt: '2026-01-07T10:00:00Z',
-    updatedAt: '2026-01-07T10:00:00Z',
-  },
-  {
-    id: '2',
-    title: 'API 연동 구현',
-    description: '백엔드 API와 연동하는 서비스 레이어를 구현합니다.',
-    status: 'active',
-    priority: 2,
-    tags: ['api', 'backend'],
-    createdAt: '2026-01-08T09:00:00Z',
-    updatedAt: '2026-01-08T09:00:00Z',
-  },
-  {
-    id: '3',
-    title: 'UI 컴포넌트 추가',
-    description: 'shadcn/ui 기반의 추가 컴포넌트를 설치합니다.',
-    status: 'draft',
-    priority: 3,
-    tags: ['ui', 'shadcn'],
-    createdAt: '2026-01-09T14:00:00Z',
-    updatedAt: '2026-01-09T14:00:00Z',
-  },
-];
 
 /**
  * 홈 페이지 컴포넌트
@@ -102,10 +64,6 @@ export default function Home() {
   // IndexedDB 메모 입력
   const [memoInput, setMemoInput] = useState('');
 
-  // API 테스트 상태
-  const [apiLoading, setApiLoading] = useState(false);
-  const [apiResult, setApiResult] = useState<string | null>(null);
-
   /**
    * 토스트 알림 데모
    */
@@ -113,13 +71,6 @@ export default function Home() {
     toast.success('성공!', {
       description: '토스트 알림이 정상적으로 표시됩니다.',
     });
-  };
-
-  /**
-   * 예시 카드 클릭 핸들러
-   */
-  const handleExampleClick = (example: Example) => {
-    toast.info(`선택됨: ${example.title}`);
   };
 
   /**
@@ -178,98 +129,15 @@ export default function Home() {
     }
   };
 
-  /**
-   * API 테스트 - Mock 호출
-   * 
-   * ============================================================
-   * 🔧 실제 백엔드 연동 가이드
-   * ============================================================
-   * 
-   * 현재는 Mock 응답을 반환합니다. 실제 백엔드 연동 시 아래와 같이 수정하세요:
-   * 
-   * 1. exampleApi 서비스 import:
-   *    import { exampleApi } from '@/features/example';
-   * 
-   * 2. 환경 변수 설정 (.env.local):
-   *    NEXT_PUBLIC_API_URL=http://your-backend-url.com/api
-   * 
-   * 3. 아래 Mock 코드를 실제 API 호출로 교체:
-   * 
-   *    // GET 요청 예시
-   *    if (method === 'GET') {
-   *      const result = await exampleApi.getList({ page: 1, limit: 10 });
-   *      setApiResult(JSON.stringify(result, null, 2));
-   *    }
-   * 
-   *    // POST 요청 예시
-   *    if (method === 'POST') {
-   *      const result = await exampleApi.create({
-   *        title: '새 항목',
-   *        description: '설명',
-   *        status: 'draft',
-   *        priority: 1,
-   *        tags: ['new'],
-   *      });
-   *      setApiResult(JSON.stringify(result, null, 2));
-   *    }
-   * 
-   *    // DELETE 요청 예시
-   *    if (method === 'DELETE') {
-   *      await exampleApi.delete('example-id');
-   *      setApiResult(JSON.stringify({ success: true }, null, 2));
-   *    }
-   * 
-   * 4. 에러 핸들링:
-   *    try {
-   *      // API 호출
-   *    } catch (error) {
-   *      if (error instanceof ApiError) {
-   *        toast.error(`API 오류: ${error.message}`);
-   *      }
-   *    }
-   * 
-   * ============================================================
-   */
-  const handleApiTest = async (method: 'GET' | 'POST' | 'DELETE') => {
-    setApiLoading(true);
-    setApiResult(null);
-
-    // ============================================================
-    // 🚧 Mock 응답 코드 (실제 연동 시 아래 블록을 교체하세요)
-    // ============================================================
-
-    // 실제 API 호출 대신 시뮬레이션 (500ms 지연)
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Mock 응답 생성
-    const mockResponse = {
-      method,
-      endpoint: method === 'GET' ? '/api/examples' : method === 'POST' ? '/api/examples (create)' : '/api/examples/1 (delete)',
-      status: 200,
-      message: `${method} 요청 성공 (Mock)`,
-      data: method === 'GET' ? mockExamples : method === 'POST' ? { id: '4', title: '새 항목' } : null,
-      timestamp: new Date().toISOString(),
-    };
-
-    setApiResult(JSON.stringify(mockResponse, null, 2));
-
-    // ============================================================
-    // 🚧 Mock 응답 코드 끝
-    // ============================================================
-
-    setApiLoading(false);
-    toast.success(`API ${method} 요청 완료 (Mock)`);
-  };
-
   return (
     <DashboardLayout>
       {/* 페이지 헤더 */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">
-          Next.js 15 템플릿 데모
+          Next.js 15 템플릿
         </h1>
         <p className="text-muted-foreground mt-2">
-          템플릿에 포함된 컴포넌트와 기능들을 확인해보세요.
+          템플릿에 포함된 기능들을 확인해보세요.
         </p>
       </div>
 
@@ -418,75 +286,6 @@ export default function Home() {
           </div>
         </CardContent>
       </Card>
-
-      {/* API 테스트 데모 */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>API 클라이언트 테스트</CardTitle>
-          <CardDescription>
-            exampleApi 서비스를 통한 API 호출 시뮬레이션 (실제 백엔드 없이 Mock 응답)
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* API 호출 버튼들 */}
-          <div className="flex flex-wrap gap-2">
-            <Button
-              onClick={() => handleApiTest('GET')}
-              disabled={apiLoading}
-            >
-              GET /examples
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => handleApiTest('POST')}
-              disabled={apiLoading}
-            >
-              POST /examples
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => handleApiTest('DELETE')}
-              disabled={apiLoading}
-            >
-              DELETE /examples/1
-            </Button>
-          </div>
-
-          {/* API 응답 결과 */}
-          {(apiLoading || apiResult) && (
-            <div className="p-4 bg-muted rounded-lg">
-              <p className="text-sm font-medium mb-2">API 응답:</p>
-              {apiLoading ? (
-                <div className="flex items-center gap-2">
-                  <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
-                  <span className="text-muted-foreground">요청 중...</span>
-                </div>
-              ) : (
-                <pre className="font-mono text-xs overflow-auto max-h-48 whitespace-pre-wrap">
-                  {apiResult}
-                </pre>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Example 카드 섹션 */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Example Feature 카드</h2>
-        <p className="text-muted-foreground mb-4">
-          카드를 클릭하면 토스트 알림이 표시됩니다.
-        </p>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {mockExamples.map((example) => (
-            <ExampleCard
-              key={example.id}
-              example={example}
-              onClick={handleExampleClick}
-            />
-          ))}
-        </div>
-      </div>
     </DashboardLayout>
   );
 }

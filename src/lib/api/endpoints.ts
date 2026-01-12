@@ -59,15 +59,6 @@ export const ENDPOINTS = {
         /** 사용자 삭제 (id 파라미터 필요) */
         DELETE: (id: string) => `/users/${id}`,
     },
-
-    /** 예시 리소스 엔드포인트 (새 리소스 추가 시 참고) */
-    EXAMPLE: {
-        LIST: '/examples',
-        DETAIL: (id: string) => `/examples/${id}`,
-        CREATE: '/examples',
-        UPDATE: (id: string) => `/examples/${id}`,
-        DELETE: (id: string) => `/examples/${id}`,
-    },
 } as const;
 
 /**

@@ -156,5 +156,3 @@ export function useBreakpoints(): BreakpointState {
         isBelow,
     };
 }
-
-export default useMediaQuery;

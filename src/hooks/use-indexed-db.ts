@@ -205,5 +205,3 @@ export function useIndexedDB<T>(options: UseIndexedDBOptions): UseIndexedDBRetur
         refresh,
     };
 }
-
-export default useIndexedDB;
