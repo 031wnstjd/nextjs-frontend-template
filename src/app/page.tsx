@@ -5,11 +5,12 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Dialog,
   DialogContent,
@@ -19,8 +20,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { useLocalStorage, useBreakpoints, useIndexedDB } from '@/hooks';
+import { useLocalStorage, useBreakpoints, useIndexedDB, useDebounce } from '@/hooks';
 import { useUIStore } from '@/lib/store';
+import { formatDate, formatNumber, formatBytes, formatRelativeTime } from '@/lib/format';
 import { toast } from 'sonner';
 
 /**
@@ -63,6 +65,21 @@ export default function Home() {
 
   // IndexedDB 메모 입력
   const [memoInput, setMemoInput] = useState('');
+
+  // 디바운스 데모
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebounce(searchInput, 500);
+  const [searchCount, setSearchCount] = useState(0);
+
+  // 디바운스 효과 확인
+  useEffect(() => {
+    if (debouncedSearch) {
+      setSearchCount((prev) => prev + 1);
+    }
+  }, [debouncedSearch]);
+
+  // Skeleton 데모
+  const [showSkeleton, setShowSkeleton] = useState(false);
 
   /**
    * 토스트 알림 데모
@@ -129,6 +146,14 @@ export default function Home() {
     }
   };
 
+  /**
+   * Skeleton 토글
+   */
+  const handleToggleSkeleton = () => {
+    setShowSkeleton(true);
+    setTimeout(() => setShowSkeleton(false), 2000);
+  };
+
   return (
     <DashboardLayout>
       {/* 페이지 헤더 */}
@@ -188,6 +213,123 @@ export default function Home() {
           </CardContent>
         </Card>
       </div>
+
+      {/* 포맷 유틸리티 데모 */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>포맷 유틸리티 데모</CardTitle>
+          <CardDescription>
+            formatDate, formatNumber, formatBytes, formatRelativeTime 함수
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm font-medium mb-2">날짜 포맷팅</p>
+              <p className="font-mono text-sm">{formatDate(new Date())}</p>
+              <p className="text-xs text-muted-foreground mt-1">formatDate(new Date())</p>
+            </div>
+
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm font-medium mb-2">상대 시간</p>
+              <p className="font-mono text-sm">{formatRelativeTime(Date.now() - 3600000)}</p>
+              <p className="text-xs text-muted-foreground mt-1">formatRelativeTime(1시간 전)</p>
+            </div>
+
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm font-medium mb-2">숫자 포맷팅</p>
+              <p className="font-mono text-sm">{formatNumber(1234567)}</p>
+              <p className="text-xs text-muted-foreground mt-1">formatNumber(1234567)</p>
+            </div>
+
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm font-medium mb-2">통화 포맷팅</p>
+              <p className="font-mono text-sm">{formatNumber(50000, { currency: 'KRW' })}</p>
+              <p className="text-xs text-muted-foreground mt-1">{`formatNumber(50000, { currency: 'KRW' })`}</p>
+            </div>
+
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm font-medium mb-2">파일 크기</p>
+              <p className="font-mono text-sm">{formatBytes(1234567890)}</p>
+              <p className="text-xs text-muted-foreground mt-1">formatBytes(1234567890)</p>
+            </div>
+
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm font-medium mb-2">축약 표기</p>
+              <p className="font-mono text-sm">{formatNumber(1234567, { compact: true })}</p>
+              <p className="text-xs text-muted-foreground mt-1">{`formatNumber(1234567, { compact: true })`}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Debounce 데모 */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>useDebounce 훅 데모</CardTitle>
+          <CardDescription>
+            입력 후 500ms 지연 후 검색 실행 (API 호출 최적화)
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Input
+            placeholder="검색어를 입력하세요..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+          <div className="p-4 bg-muted rounded-lg">
+            <div className="grid gap-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">현재 입력값:</span>
+                <span className="font-mono">{searchInput || '(없음)'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">디바운스된 값:</span>
+                <span className="font-mono">{debouncedSearch || '(없음)'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">검색 실행 횟수:</span>
+                <span className="font-mono">{searchCount}회</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Skeleton 데모 */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Skeleton 컴포넌트 데모</CardTitle>
+          <CardDescription>
+            로딩 상태 표시용 Skeleton 컴포넌트
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button onClick={handleToggleSkeleton}>
+            Skeleton 보기 (2초)
+          </Button>
+
+          {showSkeleton ? (
+            <div className="flex items-center space-x-4">
+              <Skeleton className="h-12 w-12 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[250px]" />
+                <Skeleton className="h-4 w-[200px]" />
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-4">
+              <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
+                AB
+              </div>
+              <div className="space-y-1">
+                <p className="font-medium">실제 컨텐츠</p>
+                <p className="text-sm text-muted-foreground">로딩이 완료된 상태</p>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* LocalStorage 데모 */}
       <Card className="mb-8">
@@ -255,12 +397,15 @@ export default function Home() {
           <div className="p-4 bg-muted rounded-lg">
             <p className="text-sm font-medium mb-1">저장된 메모:</p>
             {isMemoLoading ? (
-              <p className="text-muted-foreground">로딩 중...</p>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-3 w-[200px]" />
+              </div>
             ) : memo ? (
               <div>
                 <p className="font-mono text-sm">{memo.content}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  저장 시간: {new Date(memo.createdAt).toLocaleString('ko-KR')}
+                  저장 시간: {formatRelativeTime(memo.createdAt)}
                 </p>
               </div>
             ) : (

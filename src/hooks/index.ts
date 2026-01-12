@@ -6,3 +6,4 @@
 export { useLocalStorage } from './use-local-storage';
 export { useIndexedDB } from './use-indexed-db';
 export { useMediaQuery, useBreakpoints, BREAKPOINTS } from './use-media-query';
+export { useDebounce } from './use-debounce';
